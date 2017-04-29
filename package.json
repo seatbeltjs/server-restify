@@ -1,0 +1,16 @@
+{
+  "name": "@seatbelt/server-restify",
+  "version": "0.0.1",
+  "description": "SeatbeltJS restify server",
+  "main": "index.ts",
+  "keywords": [
+    "seatbelt",
+    "restify",
+    "server"
+  ],
+  "author": "Thomas Meadows",
+  "license": "MIT",
+  "dependencies": {
+    "restify": "^4.3.0"
+  }
+}
