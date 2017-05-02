@@ -11,6 +11,14 @@
   "author": "Thomas Meadows",
   "license": "MIT",
   "dependencies": {
+    "@types/restify": "^2.0.42",
     "restify": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.15",
+    "tslint": "^4.5.1",
+    "tslint-eslint-rules": "^3.5.0",
+    "tslint-microsoft-contrib": "^4.0.1",
+    "typescript": "^2.2.1"
   }
 }

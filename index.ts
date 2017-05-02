@@ -1,4 +1,4 @@
-import { Log } from '../../log';
+import { Log } from '../core/src/log';
 
 export function DRestify(): any {
   return function(OriginalClassConstructor: any) {
