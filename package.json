@@ -14,6 +14,8 @@
     "@types/restify": "^2.0.42",
     "restify": "^4.3.0"
   },
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "devDependencies": {
     "@types/node": "^7.0.15",
     "tslint": "^4.5.1",

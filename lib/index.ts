@@ -1,4 +1,4 @@
-import { Log } from '../core/src/log';
+import { createServer } from 'restify';
 
 export function DRestify(): any {
   return function(OriginalClassConstructor: any) {
@@ -8,15 +8,12 @@ export function DRestify(): any {
       origin.__seatbelt__ = 'server';
       origin.__seatbelt_strap__ = function(classesByType: any) {
         origin.restify = require('restify');
-        origin.app = origin.restify.createServer();
+        origin.app = createServer();
         origin.port = process.env.port || 3000;
-        origin.log = new Log('Express');
         origin.app.use(origin.restify.bodyParser());
         origin.app.use(origin.restify.queryParser());
         origin.__controller_wrapper__ = function (controllerFunction: Function, req: any, res: any, next: Function) {
           controllerFunction({
-            req,
-            res,
             next,
             reply: (...params: any[]) => res.send(...params),
             params: Object.assign(
@@ -25,6 +22,9 @@ export function DRestify(): any {
               typeof req.params === 'object' ? req.params : {},
               typeof req.body === 'object' ? req.body : {}
             )
+          }, {
+            req,
+            res
           });
         };
 
