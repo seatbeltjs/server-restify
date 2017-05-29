@@ -10,13 +10,14 @@
   "author": "Thomas Meadows",
   "license": "MIT",
   "dependencies": {
-    "@types/restify": "^2.0.42",
+    "@seatbelt/core": "0.0.1",
     "restify": "^4.3.0"
   },
   "main": "lib/index.js",
   "types": "lib/index.ts",
   "devDependencies": {
     "@types/node": "^7.0.15",
+    "@types/restify": "^2.0.42",
     "tslint": "^4.5.1",
     "tslint-eslint-rules": "^3.5.0",
     "tslint-microsoft-contrib": "^4.0.1",
