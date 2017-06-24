@@ -1,49 +1,54 @@
-import { createServer, bodyParser, queryParser } from 'restify';
-import { DRegisterServer, Log } from '@seatbelt/core';
+import * as restify from 'restify';
+import { DServerRegister, IServerRequest, IServerResponse, IServerRoute, Log } from '@seatbelt/core';
 
-export function DRestify(): any {
-  return function(originalClassConstructor: new () => {}) {
-    @DRegisterServer()
-    class RestifyServer extends originalClassConstructor {
-      constructor() {
-        super();
+@DServerRegister()
+export class RestifyServer {
+  public log: Log = new Log('RestifyServer');
+  public server: restify.Server = restify.createServer();
+  public port: number = process.env.port || 3000;
+  public conformServerControllerToSeatbeltController: Function = function (route: IServerRoute, req: restify.Request, res: restify.Response) {
+
+    const seatbeltResponse: IServerResponse = {
+      send: (status: number, body: any) => res.send(status, body)
+    };
+
+    const seatbeltRequest: IServerRequest = {
+      allParams: Object.assign(
+        {},
+        typeof req.query === 'object' ? req.query : {},
+        typeof req.params === 'object' ? req.params : {},
+        typeof req.body === 'object' ? req.body : {}
+      )
+    };
+
+    return route.controller(
+      seatbeltRequest,
+      seatbeltResponse,
+      {
+        req,
+        res
       }
-      public log = new Log('RestifyServer');
-      public server = createServer();
-      public port = process.env.port || 3000;
-      public __controller_wrapper__: Function = function (route: any, req: any, res: any) {
-        route.controller({
-          send: (...params: any[]) => res.send(...params),
-          params: Object.assign(
-            {},
-            typeof req.query === 'object' ? req.query : {},
-            typeof req.params === 'object' ? req.params : {},
-            typeof req.body === 'object' ? req.body : {}
-          )
-        }, {
-          req,
-          res
-        });
-      };
-      public __seatbelt_server_config__: Function = function(routes: any[]) {
-        this.server.use(bodyParser());
-        this.server.use(queryParser());
+    );
 
-        if (routes && Array.isArray(routes)) {
-          routes.forEach((route: any) => {
-            route['__seatbelt_config__'].type.forEach((eachType: string) => {
-              route['__seatbelt_config__'].path.forEach((eachPath: string) => {
-                this.server[eachType.toLowerCase()](eachPath, (req: any, res: any, next: Function) => this.__controller_wrapper__(route, req, res, next));
-              });
-            });
+  };
+  public config: Function = function(routes: IServerRoute[]) {
+    this.server.use(restify.bodyParser());
+    this.server.use(restify.queryParser());
+
+    if (routes && Array.isArray(routes)) {
+      routes.forEach((route: IServerRoute) => {
+        route['__seatbelt_config__'].type.forEach((eachType: string) => {
+          route['__seatbelt_config__'].path.forEach((eachPath: string) => {
+            this.server[eachType.toLowerCase()](eachPath, (req: restify.Request, res: restify.Response) => this.conformServerControllerToSeatbeltController(route, req, res));
           });
-        }
-      };
-      public __seatbelt_server_init__: Function = function () {
-        this.log.system(`starting server on ${this.port}`);
-        this.server.listen(this.port);
-      };
+        });
+      });
     }
-    return RestifyServer;
+  };
+  public init: Function = function () {
+    this.log.system(`starting server on ${this.port}`);
+    this.server.listen(this.port);
   };
 }
+
+export const server: RestifyServer = new RestifyServer();

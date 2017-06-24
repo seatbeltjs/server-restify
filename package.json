@@ -1,6 +1,6 @@
 {
   "name": "@seatbelt/server-restify",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "SeatbeltJS restify server",
   "keywords": [
     "seatbelt",
