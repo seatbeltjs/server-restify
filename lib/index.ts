@@ -1,14 +1,16 @@
 import * as restify from 'restify';
-import { Server } from '@seatbelt/core/lib/server';
+import { ServerPlugin } from '@seatbelt/core/plugins';
 import { Log } from '@seatbelt/core';
 
 export interface IServerConfig {
   port?: number;
 }
 
-@Server.Register()
-export class RestifyServer implements Server.BaseServer {
-  public log: Log = new Log('RestifyServer');
+@ServerPlugin.Register({
+  name: 'RestifyServer'
+})
+export class RestifyServer implements ServerPlugin.BaseServer {
+  private log: Log = new Log('RestifyServer');
   public server: restify.Server = restify.createServer();
   public port: number = process.env.port || 3000;
 
@@ -20,16 +22,15 @@ export class RestifyServer implements Server.BaseServer {
     }
   }
 
-  public conformServerControllerToSeatbeltController: Function = function (route: Server.Route, req: restify.Request, res: restify.Response) {
-
-    const seatbeltResponse: Server.Response = {
+  public conformServerControllerToSeatbeltController: Function = function (route: ServerPlugin.Route, req: restify.Request, res: restify.Response) {
+    const seatbeltResponse: ServerPlugin.Response = {
       send: (status: number, body: Object) => {
         res.status(status);
         return res.send(body);
       }
     };
 
-    const seatbeltRequest: Server.Request = {
+    const seatbeltRequest: ServerPlugin.Request = {
       allParams: Object.assign(
         {},
         typeof req.query === 'object' ? req.query : {},
@@ -46,17 +47,18 @@ export class RestifyServer implements Server.BaseServer {
         res
       }
     );
-
   };
 
-  public config: Server.Config = function(routes: Server.Route[]) {
+  public config: ServerPlugin.Config = function(seatbelt: any) {
+    const routes: ServerPlugin.Route[] = seatbelt.plugins.route;
+
     this.server.use(restify.bodyParser());
     this.server.use(restify.queryParser());
 
     if (routes && Array.isArray(routes)) {
-      routes.forEach((route: Server.Route) => {
-        route['__seatbeltConfig'].type.forEach((eachType: string) => {
-          route['__seatbeltConfig'].path.forEach((eachPath: string) => {
+      routes.forEach((route: ServerPlugin.Route) => {
+        route['__routeConfig'].type.forEach((eachType: string) => {
+          route['__routeConfig'].path.forEach((eachPath: string) => {
             this.server[eachType.toLowerCase()](eachPath, (req: restify.Request, res: restify.Response) => this.conformServerControllerToSeatbeltController(route, req, res));
           });
         });
@@ -64,7 +66,7 @@ export class RestifyServer implements Server.BaseServer {
     }
   };
 
-  public init: Server.Init = function () {
+  public init: ServerPlugin.Init = function () {
     this.log.system(`starting server on ${this.port}`);
     this.server.listen(this.port);
   };

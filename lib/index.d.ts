@@ -1,15 +1,14 @@
 import * as restify from 'restify';
-import { Server } from '@seatbelt/core/lib/server';
-import { Log } from '@seatbelt/core';
+import { ServerPlugin } from '@seatbelt/core/plugins';
 export interface IServerConfig {
     port?: number;
 }
-export declare class RestifyServer implements Server.BaseServer {
-    log: Log;
+export declare class RestifyServer implements ServerPlugin.BaseServer {
+    private log;
     server: restify.Server;
     port: number;
     constructor(config?: IServerConfig);
     conformServerControllerToSeatbeltController: Function;
-    config: Server.Config;
-    init: Server.Init;
+    config: ServerPlugin.Config;
+    init: ServerPlugin.Init;
 }
