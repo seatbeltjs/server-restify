@@ -3,7 +3,7 @@ import { ServerPlugin } from '@seatbelt/core/plugins';
 export interface IServerConfig {
     port?: number;
 }
-export declare class RestifyServer implements ServerPlugin.BaseServer {
+export declare class RestifyServer implements ServerPlugin.BaseInterface {
     private log;
     server: restify.Server;
     port: number;
